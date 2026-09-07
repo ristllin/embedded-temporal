@@ -1,0 +1,4 @@
+# oracle SDKs — pinned to the versions the goldens were captured with
+# (see goldens/NOTES.md). Bump deliberately + re-run `make goldens`.
+mistralai-workflows==3.9.0
+temporalio==1.27.2

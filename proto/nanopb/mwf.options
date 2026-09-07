@@ -1,0 +1,49 @@
+# mwf.options — nanopb field caps for the Temporal message closure.
+#
+# nanopb generates STATIC C structs: every string/bytes/repeated/map field needs
+# a compile-time bound or it becomes a heap CALLBACK field (FT_CALLBACK). We bound
+# them so the generated structs are static-alloc-friendly for the ESP32-S3 (no
+# malloc churn, no callback plumbing on the device worker's hot path).
+#
+# ⚠ nanopb precedence: when several lines match a field, the LAST one wins. So the
+# broad wildcard defaults go FIRST and the specific overrides go AFTER.
+#
+# Syntax: <fully.qualified.field-glob>  key:value, key:value
+# Map fields expand to a synthetic nested <Msg>.<Field-Pascal>Entry message whose
+# .key / .value are the fields to cap (e.g. Payload.MetadataEntry.value).
+
+# ── Global defaults (matched first, overridden below) ─────────────────────────
+# Kept deliberately TIGHT: the full Temporal closure contains huge aggregate
+# messages (MarkerRecorded, ActivityExecutionInfo …) whose static size explodes
+# multiplicatively with these caps. 64 B / 4 elems keeps every struct well under
+# nanopb's field-offset limits while covering ids/names/namespaces/run-ids. The
+# device worker overrides the few fields that carry real bulk (Payload.data etc).
+* max_size:64
+* max_count:4
+
+# ── Payload: the money field. Activity args/results ride here as raw JSON. ──────
+temporal.api.common.v1.Payload.data                    max_size:1024
+temporal.api.common.v1.Payload.metadata                max_count:8
+temporal.api.common.v1.Payload.MetadataEntry.key       max_size:64
+temporal.api.common.v1.Payload.MetadataEntry.value     max_size:128
+
+# Payloads: a small list of Payloads (activity input/result vectors).
+temporal.api.common.v1.Payloads.payloads               max_count:8
+
+# Header / Memo: map<string,Payload> — keep the maps small on-device.
+temporal.api.common.v1.Header.fields                   max_count:8
+temporal.api.common.v1.Header.FieldsEntry.key          max_size:64
+temporal.api.common.v1.Memo.fields                     max_count:8
+temporal.api.common.v1.Memo.FieldsEntry.key            max_size:64
+
+# ── Task tokens are opaque server bytes; give them room. ───────────────────────
+*.task_token                                           max_size:256
+
+# ── Failure: message/stack/source are FT_CALLBACK by default; cap → static. ─────
+temporal.api.failure.v1.Failure.message                max_size:512
+temporal.api.failure.v1.Failure.stack_trace            max_size:512
+temporal.api.failure.v1.Failure.source                 max_size:64
+
+# ── google.protobuf.Any: type_url + opaque value bytes. ────────────────────────
+google.protobuf.Any.type_url                           max_size:128
+google.protobuf.Any.value                              max_size:512

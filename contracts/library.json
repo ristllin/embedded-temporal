@@ -1,0 +1,14 @@
+{
+  "name": "contracts",
+  "version": "0.1.0",
+  "description": "mwf frozen Phase-0 contracts: the seven portable C++17 interfaces (ITransport, IPayloadCodec, IDurableStore, determinism seams, IActivityRegistry) every track codes against. Header-only, no Arduino.",
+  "keywords": "mwf, temporal, mistral-workflows, contracts, esp32",
+  "authors": [{ "name": "Roy Darnell" }],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "headers": "mwf/contracts.h",
+  "export": {
+    "include": ["include", "CONTRACTS.md", "README.md"]
+  }
+}

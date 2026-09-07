@@ -1,0 +1,151 @@
+{
+  "probe": "sole_worker",
+  "variant": "no_activity",
+  "workflow": "mwf_sole_probe",
+  "task_queue": "mwf-sole-probe",
+  "whoami": {
+    "scheduler_url": "wf-scheduler.mistral.ai:443",
+    "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+    "tls": true
+  },
+  "captured_at": "2026-07-18T12:45:40+0100",
+  "register": {
+    "request": {
+      "definitions": [
+        {
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "title": "run_Input",
+            "type": "object"
+          },
+          "name": "mwf_sole_probe",
+          "task_queue": "mwf-sole-probe",
+          "output_schema": {
+            "properties": {
+              "result": {
+                "title": "Result",
+                "type": "string"
+              }
+            },
+            "required": [
+              "result"
+            ],
+            "title": "run_Output",
+            "type": "object"
+          },
+          "signals": [],
+          "queries": [],
+          "updates": [],
+          "enforce_determinism": true,
+          "on_behalf_of": false,
+          "execution_timeout": "PT1H",
+          "plugin_metadata": null,
+          "display_name": null,
+          "description": null,
+          "is_technical": false,
+          "schedules": []
+        }
+      ],
+      "deployment_name": "mwf-sole-probe",
+      "worker_name": "mwf-sole-probe-worker",
+      "deployment_location": {
+        "location_type": "local"
+      }
+    },
+    "status": 200,
+    "response": {
+      "has_conflicts": false,
+      "workflow_version_ids": [
+        "019f750b-e21e-7436-88b6-255493b9d732"
+      ],
+      "workflow_registration_ids": [
+        "019f750b-e21e-7436-88b6-255493b9d732"
+      ],
+      "workflow_version_refs": [
+        {
+          "workflow_id": "019f750b-e219-7209-b48b-c6308a2c7cab",
+          "workflow_registration_id": "019f750b-e21e-7436-88b6-255493b9d732",
+          "workflow_version_id": "019f750b-e21e-7436-88b6-255493b9d732"
+        }
+      ],
+      "workflow_registration_refs": [
+        {
+          "workflow_id": "019f750b-e219-7209-b48b-c6308a2c7cab",
+          "workflow_registration_id": "019f750b-e21e-7436-88b6-255493b9d732",
+          "workflow_version_id": "019f750b-e21e-7436-88b6-255493b9d732"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "active_after_register_no_heartbeat": {
+    "workflow": {
+      "id": "019f750b-e219-7209-b48b-c6308a2c7cab",
+      "name": "mwf_sole_probe",
+      "display_name": "mwf_sole_probe",
+      "type": "code",
+      "description": "",
+      "customer_id": "00000000-0000-4000-8000-000000000000",
+      "workspace_id": "11111111-1111-4111-8111-111111111111",
+      "shared_namespace": null,
+      "available_in_chat_assistant": false,
+      "is_technical": false,
+      "archived": false,
+      "tags": [],
+      "active": true
+    }
+  },
+  "trigger_response": {
+    "workflow_name": "mwf_sole_probe",
+    "workflow_id": null,
+    "deployment_name": null,
+    "execution_id": "fd794ec29cd655c0816bf446b03f244df3421e8d9761514cad8f61cf11bb4b7a",
+    "parent_execution_id": null,
+    "root_execution_id": "fd794ec29cd655c0816bf446b03f244df3421e8d9761514cad8f61cf11bb4b7a",
+    "run_id": null,
+    "user_id": null,
+    "status": "RUNNING",
+    "start_time": "2026-07-18T11:45:41.496153Z",
+    "end_time": null,
+    "total_duration_ms": null,
+    "result": null
+  },
+  "responded_commands": [
+    "COMPLETE_WORKFLOW_EXECUTION"
+  ],
+  "internal_activity_commands_emitted": 0,
+  "final_execution_status": {
+    "workflow_name": "mwf_sole_probe",
+    "workflow_id": "019f750b-e219-7209-b48b-c6308a2c7cab",
+    "deployment_name": "mwf-sole-probe",
+    "execution_id": "fd794ec29cd655c0816bf446b03f244df3421e8d9761514cad8f61cf11bb4b7a",
+    "parent_execution_id": null,
+    "root_execution_id": "fd794ec29cd655c0816bf446b03f244df3421e8d9761514cad8f61cf11bb4b7a",
+    "run_id": null,
+    "user_id": "22222222-2222-4222-8222-222222222222",
+    "status": "COMPLETED",
+    "start_time": "2026-07-18T11:45:41.496153Z",
+    "end_time": "2026-07-18T11:45:41.725716Z",
+    "total_duration_ms": 229,
+    "result": {
+      "result": "Hello nimbus from RAW sole-worker (no SDK)"
+    }
+  },
+  "final_history_event_types": [
+    "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED",
+    "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+    "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+    "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+    "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED"
+  ],
+  "VERDICT_declarative_replay_sufficient": true
+}

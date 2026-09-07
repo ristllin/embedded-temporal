@@ -1,0 +1,29 @@
+{
+  "name": "transport",
+  "version": "0.1.0",
+  "description": "mwf ITransport implementations. On device (this PlatformIO view): gRPC-over-HTTP/2 via the portable grpc_h2 core + vendored nghttp2 + WiFiClientSecure (mbedTLS, ALPN h2). The desktop grpc++/libcurl twin under src/ + esp/host/ is CMake-only and excluded here.",
+  "keywords": "mwf, temporal, grpc, http2, nghttp2, esp32",
+  "authors": [{ "name": "Roy Darnell" }],
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": {
+    "contracts": "symlink://../contracts"
+  },
+  "build": {
+    "srcDir": "esp",
+    "includeDir": "esp",
+    "srcFilter": [
+      "-<*>",
+      "+<grpc_h2.cpp>",
+      "+<esp_transport.cpp>",
+      "+<third_party/nghttp2/lib/*.c>"
+    ],
+    "flags": [
+      "-Iesp/third_party/nghttp2/lib/includes",
+      "-Iesp/third_party/nghttp2",
+      "-DHAVE_CONFIG_H",
+      "-DNGHTTP2_STATICLIB"
+    ]
+  }
+}

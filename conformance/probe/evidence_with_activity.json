@@ -1,0 +1,160 @@
+{
+  "probe": "sole_worker",
+  "variant": "with_activity",
+  "workflow": "mwf_sole_probe_act",
+  "task_queue": "mwf-sole-probe-act",
+  "whoami": {
+    "scheduler_url": "wf-scheduler.mistral.ai:443",
+    "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+    "tls": true
+  },
+  "captured_at": "2026-07-18T12:46:08+0100",
+  "register": {
+    "request": {
+      "definitions": [
+        {
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "title": "run_Input",
+            "type": "object"
+          },
+          "name": "mwf_sole_probe_act",
+          "task_queue": "mwf-sole-probe-act",
+          "output_schema": {
+            "properties": {
+              "result": {
+                "title": "Result",
+                "type": "string"
+              }
+            },
+            "required": [
+              "result"
+            ],
+            "title": "run_Output",
+            "type": "object"
+          },
+          "signals": [],
+          "queries": [],
+          "updates": [],
+          "enforce_determinism": true,
+          "on_behalf_of": false,
+          "execution_timeout": "PT1H",
+          "plugin_metadata": null,
+          "display_name": null,
+          "description": null,
+          "is_technical": false,
+          "schedules": []
+        }
+      ],
+      "deployment_name": "mwf-sole-probe-act",
+      "worker_name": "mwf-sole-probe-worker",
+      "deployment_location": {
+        "location_type": "local"
+      }
+    },
+    "status": 200,
+    "response": {
+      "has_conflicts": false,
+      "workflow_version_ids": [
+        "019f750c-4faf-72b9-a043-31b49fb7da60"
+      ],
+      "workflow_registration_ids": [
+        "019f750c-4faf-72b9-a043-31b49fb7da60"
+      ],
+      "workflow_version_refs": [
+        {
+          "workflow_id": "019f750c-4fa9-7684-b2e4-d95a7944b7ec",
+          "workflow_registration_id": "019f750c-4faf-72b9-a043-31b49fb7da60",
+          "workflow_version_id": "019f750c-4faf-72b9-a043-31b49fb7da60"
+        }
+      ],
+      "workflow_registration_refs": [
+        {
+          "workflow_id": "019f750c-4fa9-7684-b2e4-d95a7944b7ec",
+          "workflow_registration_id": "019f750c-4faf-72b9-a043-31b49fb7da60",
+          "workflow_version_id": "019f750c-4faf-72b9-a043-31b49fb7da60"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "active_after_register_no_heartbeat": {
+    "workflow": {
+      "id": "019f750c-4fa9-7684-b2e4-d95a7944b7ec",
+      "name": "mwf_sole_probe_act",
+      "display_name": "mwf_sole_probe_act",
+      "type": "code",
+      "description": "",
+      "customer_id": "00000000-0000-4000-8000-000000000000",
+      "workspace_id": "11111111-1111-4111-8111-111111111111",
+      "shared_namespace": null,
+      "available_in_chat_assistant": false,
+      "is_technical": false,
+      "archived": false,
+      "tags": [],
+      "active": true
+    }
+  },
+  "trigger_response": {
+    "workflow_name": "mwf_sole_probe_act",
+    "workflow_id": null,
+    "deployment_name": null,
+    "execution_id": "44582dec21df54f9bc3d9fb676b7609c7736d577b1ed53e9b851290a22bfdd1e",
+    "parent_execution_id": null,
+    "root_execution_id": "44582dec21df54f9bc3d9fb676b7609c7736d577b1ed53e9b851290a22bfdd1e",
+    "run_id": null,
+    "user_id": null,
+    "status": "RUNNING",
+    "start_time": "2026-07-18T11:46:09.559582Z",
+    "end_time": null,
+    "total_duration_ms": null,
+    "result": null
+  },
+  "responded_commands": [
+    "SCHEDULE_ACTIVITY_TASK",
+    "COMPLETE_WORKFLOW_EXECUTION"
+  ],
+  "internal_activity_commands_emitted": 0,
+  "final_execution_status": {
+    "workflow_name": "mwf_sole_probe_act",
+    "workflow_id": "019f750c-4fa9-7684-b2e4-d95a7944b7ec",
+    "deployment_name": "mwf-sole-probe-act",
+    "execution_id": "44582dec21df54f9bc3d9fb676b7609c7736d577b1ed53e9b851290a22bfdd1e",
+    "parent_execution_id": null,
+    "root_execution_id": "44582dec21df54f9bc3d9fb676b7609c7736d577b1ed53e9b851290a22bfdd1e",
+    "run_id": null,
+    "user_id": "22222222-2222-4222-8222-222222222222",
+    "status": "COMPLETED",
+    "start_time": "2026-07-18T11:46:09.559582Z",
+    "end_time": "2026-07-18T11:46:10.161513Z",
+    "total_duration_ms": 601,
+    "result": {
+      "device": "mwf-esp32s3",
+      "echo": "nimbus",
+      "via": "raw-sole-worker"
+    }
+  },
+  "final_history_event_types": [
+    "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED",
+    "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+    "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+    "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+    "EVENT_TYPE_ACTIVITY_TASK_SCHEDULED",
+    "EVENT_TYPE_ACTIVITY_TASK_STARTED",
+    "EVENT_TYPE_ACTIVITY_TASK_COMPLETED",
+    "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+    "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+    "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+    "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED"
+  ],
+  "VERDICT_declarative_replay_sufficient": true
+}

@@ -1,0 +1,9 @@
+WorkerLoop	KEYWORD1
+ActivityRegistry	KEYWORD1
+PayloadCodecV1	KEYWORD1
+NanopbWorkerAdapter	KEYWORD1
+EspTransport	KEYWORD1
+WorkerConfig	KEYWORD1
+runOnce	KEYWORD2
+tick	KEYWORD2
+registerActivity	KEYWORD2

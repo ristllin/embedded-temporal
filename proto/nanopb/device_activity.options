@@ -1,0 +1,46 @@
+# device_activity.options — nanopb caps for the DEVICE activity-worker subset
+# (proto/mwf/device_activity.proto). Same precedence rule as mwf.options: last
+# matching line wins, wildcards first.
+#
+# Sizing rationale (measured):
+#   - task_token: 121 B observed live on the dev-server E2E → 256 gives 2×.
+#   - namespace: Mistral's is "<uuid>:<uuid>" = 73 chars → 128.
+#   - Payload.data: 8 KB (activity args/results ride here as raw JSON; the
+#     device is the worker, keep room for real arguments).
+#   - Payloads: 4 per vector (a device activity takes one argument payload;
+#     4 matches the worker-loop shape with headroom).
+# Static footprint at these caps: PollActivityTaskQueueResponse ≈ 34 KB,
+# RespondActivityTaskCompletedRequest ≈ 34 KB — the adapter heap-allocates
+# them per call (PSRAM on device via heap_caps_malloc_extmem_enable), never
+# statics/stack.
+
+* max_size:128
+* max_count:4
+
+# Shared IDENTITY types (also imported by device_workflow.proto — these lines MUST
+# stay MIRRORED in device_workflow.options, see its note, or the two generation
+# passes compute different embedded-submessage widths → FIELDINFO_DOES_NOT_FIT).
+# WorkflowExecution.workflow_id carries Mistral's 64-hex EXECUTION id (measured 64 B
+# in probe/workflow_task_1.json) — the 128 default already held it,
+# but cap it EXPLICITLY at 256 so the intent + headroom are documented and the two
+# files agree. run_id is a UUID (36 B); the *Type/TaskQueue names are short.
+mwf.device.v1.WorkflowExecution.workflow_id    max_size:256
+mwf.device.v1.WorkflowExecution.run_id         max_size:128
+mwf.device.v1.WorkflowType.name                max_size:128
+mwf.device.v1.ActivityType.name                max_size:128
+mwf.device.v1.TaskQueue.name                   max_size:128
+
+mwf.device.v1.Payload.data                     max_size:8192
+mwf.device.v1.Payload.metadata                 max_count:8
+mwf.device.v1.Payload.MetadataEntry.key        max_size:64
+mwf.device.v1.Payload.MetadataEntry.value      max_size:128
+
+mwf.device.v1.Payloads.payloads                max_count:4
+
+mwf.device.v1.PollActivityTaskQueueResponse.task_token       max_size:256
+mwf.device.v1.RespondActivityTaskCompletedRequest.task_token max_size:256
+mwf.device.v1.RespondActivityTaskFailedRequest.task_token    max_size:256
+
+mwf.device.v1.Failure.message                  max_size:512
+mwf.device.v1.Failure.stack_trace              max_size:256
+mwf.device.v1.Failure.source                   max_size:64

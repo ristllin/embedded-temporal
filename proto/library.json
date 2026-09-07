@@ -1,0 +1,33 @@
+{
+  "name": "proto",
+  "version": "0.1.0",
+  "description": "mwf device view: the nanopb workflow-task subset (gen/nanopb-device, wire-identical trim of the temporal.api activity-worker messages) + the NanopbWorkerAdapter realizing core's IWorkerProtoAdapter. The libprotobuf host twin is CMake-only and excluded here.",
+  "keywords": "mwf, temporal, nanopb, protobuf, esp32",
+  "authors": [{ "name": "Roy Darnell" }],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "contracts": "symlink://../contracts",
+    "core": "symlink://../core"
+  },
+  "build": {
+    "srcDir": ".",
+    "includeDir": "gen",
+    "srcFilter": [
+      "-<*>",
+      "+<gen/nanopb_worker_adapter.cpp>",
+      "+<gen/nanopb_workflow_adapter.cpp>",
+      "+<gen/nanopb-device/mwf/device_activity.pb.c>",
+      "+<gen/nanopb-device/mwf/device_workflow.pb.c>",
+      "+<third_party/nanopb/pb_encode.c>",
+      "+<third_party/nanopb/pb_decode.c>",
+      "+<third_party/nanopb/pb_common.c>"
+    ],
+    "flags": [
+      "-Igen/nanopb-device",
+      "-Ithird_party/nanopb",
+      "-DPB_FIELD_32BIT"
+    ]
+  }
+}

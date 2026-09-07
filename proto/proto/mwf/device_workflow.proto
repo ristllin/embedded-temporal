@@ -1,0 +1,281 @@
+// device_workflow.proto — the DEVICE (nanopb) trim of the WORKFLOW-TASK wire.
+//
+// The ESP32 as a full WORKFLOW worker (on-device replay), not just an
+// activity worker. A wire-identical mirror of ONLY the messages + fields the
+// on-device replay engine (core WorkflowLoop + replay_engine) touches:
+// poll a workflow task, walk its History, and respond with the Commands the
+// replay produced. Protobuf carries no package/message names on the wire — only
+// field numbers + wire types — so these slim mirrors are byte-compatible with
+// temporal.api.* as long as the FIELD NUMBERS below match the vendored originals
+// (third_party/temporal-api). That is asserted cross-lib against the REAL
+// temporal messages AND real conformance golden histories by
+// test/test_nanopb_device_workflow_conformance.cpp.
+//
+// Companion of device_activity.proto; it REUSES that file's common closure
+// (Payload, Payloads, WorkflowExecution, WorkflowType, ActivityType, TaskQueue,
+// Failure) via import — same package, same field numbers, same nanopb caps — so
+// there is exactly one on-device Payload struct + one .options treatment of the
+// map<string,bytes> metadata pain point.
+//
+// ── TRIMMED oneofs (hard cases found sizing the activity subset, bounded here) ─
+//  * HistoryEvent.attributes: the original has 60+ arms (field #6..#65). We keep
+//    ONLY the 13 the replay engine decodes (see core/history.h EventType),
+//    at their ORIGINAL field numbers. Omitted arms (MarkerRecorded #25, Upsert
+//    #45, all Child/External/Nexus/Update events, …) are never in the descriptor,
+//    so on decode their tags are skipped as unknown fields (proto3) — the whole
+//    point of the trim, and it is proven against a real MarkerRecorded arm in the
+//    conformance test. Omitting them ALSO dodges MarkerRecordedEventAttributes,
+//    the >64 KB aggregate flagged when sizing the activity subset: it is simply
+//    not generated.
+//  * Command.attributes: original has 18 arms; we keep the 4 a v1 replay emits.
+//  * Failure.cause (Failure→Failure recursion) is NOT reachable here — we read
+//    only Failure.message, and device_activity.proto's Failure has no `cause`
+//    field, so the nanopb recursion-→-callback problem never arises on-device.
+//
+// Fields deliberately OMITTED from the originals (timestamps, worker-version
+// stamps, retry policy, headers, sticky attributes, query/message plumbing,
+// SDK metadata, priority, …) are simply never sent (requests) or skipped as
+// unknown fields (responses) — proto3 semantics.
+syntax = "proto3";
+
+package mwf.device.v1;
+
+import "mwf/device_activity.proto";  // Payload(s), WorkflowExecution, Workflow/
+                                     // ActivityType, TaskQueue, Failure
+
+// ── google.protobuf.Duration mirror (seconds=1, nanos=2) ──────────────────────
+// Command timeouts ride a Duration; we mirror it locally rather than import the
+// well-known type so the device subset needs no google/ protos. Wire-identical.
+message Duration {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  HistoryEvent — TRIMMED oneof (13 arms of the original 60+, original numbers)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// temporal.api.history.v1.WorkflowExecutionStartedEventAttributes — the replay
+// engine reads workflow_type.name, input payloads, run ids, workflow_id.
+// original_execution_run_id=14, first_execution_run_id=16 (fallback), workflow_id=28.
+message WorkflowExecutionStartedEventAttributes {
+  WorkflowType workflow_type = 1;
+  Payloads input = 6;
+  string original_execution_run_id = 14;
+  string first_execution_run_id = 16;
+  string workflow_id = 28;
+}
+
+// WorkflowTaskScheduled/Started/Completed — the engine tracks their event ids
+// (scheduled/started back-refs) but no payload; keep the id fields only.
+message WorkflowTaskScheduledEventAttributes {}
+message WorkflowTaskStartedEventAttributes {
+  int64 scheduled_event_id = 1;
+}
+message WorkflowTaskCompletedEventAttributes {
+  int64 scheduled_event_id = 1;
+  int64 started_event_id = 2;
+}
+
+// temporal.api.history.v1.ActivityTaskScheduledEventAttributes — activity_id=1,
+// activity_type.name=2, input=6. (task_queue/header/timeouts/retry omitted.)
+message ActivityTaskScheduledEventAttributes {
+  string activity_id = 1;
+  ActivityType activity_type = 2;
+  Payloads input = 6;
+}
+
+// ActivityTaskStarted — scheduled_event_id back-ref (=1).
+message ActivityTaskStartedEventAttributes {
+  int64 scheduled_event_id = 1;
+}
+
+// ActivityTaskCompleted — result=1, scheduled_event_id=2, started_event_id=3.
+message ActivityTaskCompletedEventAttributes {
+  Payloads result = 1;
+  int64 scheduled_event_id = 2;
+  int64 started_event_id = 3;
+}
+
+// ActivityTaskFailed — failure.message=1, scheduled_event_id=2, started_event_id=3.
+message ActivityTaskFailedEventAttributes {
+  Failure failure = 1;
+  int64 scheduled_event_id = 2;
+  int64 started_event_id = 3;
+}
+
+// TimerStarted — timer_id=1. TimerFired — timer_id=1, started_event_id=2 (ref).
+message TimerStartedEventAttributes {
+  string timer_id = 1;
+}
+message TimerFiredEventAttributes {
+  string timer_id = 1;
+  int64 started_event_id = 2;
+}
+
+// WorkflowExecutionCompleted — result payloads=1.
+message WorkflowExecutionCompletedEventAttributes {
+  Payloads result = 1;
+}
+
+// WorkflowExecutionFailed — failure.message=1.
+message WorkflowExecutionFailedEventAttributes {
+  Failure failure = 1;
+}
+
+// WorkflowExecutionSignaled — signal_name=1, input=2.
+message WorkflowExecutionSignaledEventAttributes {
+  string signal_name = 1;
+  Payloads input = 2;
+}
+
+// temporal.api.history.v1.HistoryEvent — event_id=1, event_type=3 (enum encodes
+// as a varint; int32 on the wire), and the TRIMMED attributes oneof. The oneof
+// arm NUMBERS are identical to the original message.proto so the wire stays
+// compatible; only the 13 decoded arms are present.
+//
+// ⚠ nanopb struct-layout note: nanopb inlines a oneof's largest arm as a union,
+// and lays struct members out in DECLARATION order. The attribute-carrying arms
+// (Payloads inside them) dominate the union; keeping the oneof the LAST member
+// keeps every other field's offset small. The aggregate (History and the two
+// messages embedding it) still exceeds 64 kB at these caps, so the device
+// subset REQUIRES -DPB_FIELD_32BIT (the build files define it; the generated
+// .pb.c enforces it with an #error).
+message HistoryEvent {
+  int64 event_id = 1;
+  int32 event_type = 3;  // temporal.api.enums.v1.EventType (varint)
+  oneof attributes {
+    WorkflowExecutionStartedEventAttributes   workflow_execution_started_event_attributes = 6;
+    WorkflowExecutionCompletedEventAttributes workflow_execution_completed_event_attributes = 7;
+    WorkflowExecutionFailedEventAttributes    workflow_execution_failed_event_attributes = 8;
+    WorkflowTaskScheduledEventAttributes      workflow_task_scheduled_event_attributes = 10;
+    WorkflowTaskStartedEventAttributes        workflow_task_started_event_attributes = 11;
+    WorkflowTaskCompletedEventAttributes      workflow_task_completed_event_attributes = 12;
+    ActivityTaskScheduledEventAttributes      activity_task_scheduled_event_attributes = 15;
+    ActivityTaskStartedEventAttributes        activity_task_started_event_attributes = 16;
+    ActivityTaskCompletedEventAttributes      activity_task_completed_event_attributes = 17;
+    ActivityTaskFailedEventAttributes         activity_task_failed_event_attributes = 18;
+    TimerStartedEventAttributes               timer_started_event_attributes = 20;
+    TimerFiredEventAttributes                 timer_fired_event_attributes = 21;
+    WorkflowExecutionSignaledEventAttributes  workflow_execution_signaled_event_attributes = 26;
+  }
+}
+
+// temporal.api.history.v1.History — repeated HistoryEvent events=1.
+message History {
+  repeated HistoryEvent events = 1;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Command — TRIMMED oneof (4 arms of the original 18, original numbers)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// temporal.api.command.v1.ScheduleActivityTaskCommandAttributes — activity_id=1,
+// activity_type.name=2, task_queue.name=4, input=6, and the timeouts the server
+// requires (schedule_to_close=7, schedule_to_start=8, start_to_close=9,
+// heartbeat=10). (header/retry_policy/priority omitted.)
+message ScheduleActivityTaskCommandAttributes {
+  string activity_id = 1;
+  ActivityType activity_type = 2;
+  TaskQueue task_queue = 4;
+  Payloads input = 6;
+  Duration schedule_to_close_timeout = 7;
+  Duration schedule_to_start_timeout = 8;
+  Duration start_to_close_timeout = 9;
+  Duration heartbeat_timeout = 10;
+}
+
+// StartTimer — timer_id=1, start_to_fire_timeout=2.
+message StartTimerCommandAttributes {
+  string timer_id = 1;
+  Duration start_to_fire_timeout = 2;
+}
+
+// CompleteWorkflowExecution — result payloads=1.
+message CompleteWorkflowExecutionCommandAttributes {
+  Payloads result = 1;
+}
+
+// FailWorkflowExecution — failure=1.
+message FailWorkflowExecutionCommandAttributes {
+  Failure failure = 1;
+}
+
+// temporal.api.command.v1.Command — command_type=1 (enum→varint), TRIMMED
+// attributes oneof (arms at original numbers 2/3/4/5).
+message Command {
+  int32 command_type = 1;  // temporal.api.enums.v1.CommandType (varint)
+  oneof attributes {
+    ScheduleActivityTaskCommandAttributes      schedule_activity_task_command_attributes = 2;
+    StartTimerCommandAttributes                start_timer_command_attributes = 3;
+    CompleteWorkflowExecutionCommandAttributes complete_workflow_execution_command_attributes = 4;
+    FailWorkflowExecutionCommandAttributes     fail_workflow_execution_command_attributes = 5;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Workflow-task RPC request/response messages
+// ═══════════════════════════════════════════════════════════════════════════
+
+// temporal.api.workflowservice.v1.PollWorkflowTaskQueueRequest —
+// namespace=1, task_queue=2, identity=3.
+message PollWorkflowTaskQueueRequest {
+  string namespace_ = 1;  // "namespace" is a C++ keyword; names are not on the wire
+  TaskQueue task_queue = 2;
+  string identity = 3;
+}
+
+// temporal.api.workflowservice.v1.PollWorkflowTaskQueueResponse — the fields the
+// workflow loop consumes: task_token=1, workflow_execution=2, workflow_type=3,
+// previous_started_event_id=4, started_event_id=5, attempt=6, history=8,
+// next_page_token=9.
+//
+// ⚠ SINGLE-PAGE ASSUMPTION (v1): next_page_token IS kept (field 9) so a paged
+// server response is not silently mis-decoded, but the v1 device replay assumes
+// the whole History arrives in ONE page (next_page_token empty). If a non-empty
+// next_page_token is decoded, the worker must treat the task as un-replayable
+// (GetWorkflowExecutionHistory paging is out of scope for this device workflow
+// subset) rather than replay a truncated history. The conformance goldens are
+// all single-page.
+//
+// ⚠ FIELD-ORDER: `history` is declared LAST on purpose. nanopb inlines History
+// (a ~large static aggregate at these caps) as a struct member in declaration
+// order; putting it last keeps every other field's offset small. The embedded
+// History still pushes this message past 64 kB, so the build compiles with
+// PB_FIELD_32BIT (see the generated .pb.c's #error guard).
+message PollWorkflowTaskQueueResponse {
+  bytes task_token = 1;
+  WorkflowExecution workflow_execution = 2;
+  WorkflowType workflow_type = 3;
+  int64 previous_started_event_id = 4;
+  int64 started_event_id = 5;
+  int32 attempt = 6;
+  bytes next_page_token = 9;
+  History history = 8;
+}
+
+// temporal.api.workflowservice.v1.RespondWorkflowTaskCompletedRequest —
+// task_token=1, commands=2 (repeated), identity=3, namespace=9.
+message RespondWorkflowTaskCompletedRequest {
+  bytes task_token = 1;
+  repeated Command commands = 2;
+  string identity = 3;
+  string namespace_ = 9;  // "namespace" is a C++ keyword; names are not on the wire
+}
+message RespondWorkflowTaskCompletedResponse {}
+
+// temporal.api.workflowservice.v1.SignalWorkflowExecutionRequest — the SIGNAL
+// SENDER's RPC (ClientOps::signalWorkflow), the control side that delivers a
+// WorkflowExecutionSignaled event to a workflow parked on a wait_signal step.
+// namespace=1, workflow_execution=2, signal_name=3, input=4, identity=5.
+// The originals' request_id=6, control=7, header=8, links=10 are OMITTED — never
+// sent, and de-dup/tracing are out of scope for the device sender (proto3: the
+// server skips absent fields). Field numbers match request_response.proto.
+message SignalWorkflowExecutionRequest {
+  string namespace_ = 1;  // "namespace" is a C++ keyword; names are not on the wire
+  WorkflowExecution workflow_execution = 2;
+  string signal_name = 3;
+  Payloads input = 4;
+  string identity = 5;
+}
+message SignalWorkflowExecutionResponse {}

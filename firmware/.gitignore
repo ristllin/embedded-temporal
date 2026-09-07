@@ -1,0 +1,6 @@
+.pio/
+build/
+*.o
+*.a
+.DS_Store
+src/mwf_prov_secrets.h

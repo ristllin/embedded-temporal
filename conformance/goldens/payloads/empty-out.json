@@ -1,0 +1,28 @@
+{
+  "description": "Activity result: logically-empty payload (empty_payload flag set).",
+  "direction": "out",
+  "encoding": "json/wf_v1",
+  "metadata": {
+    "encoding_options": "",
+    "empty_payload": "AA==",
+    "namespace": "MDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAwOjExMTExMTExLTExMTEtNDExMS04MTExLTExMTExMTExMTExMQ==",
+    "encoding": "anNvbi93Zl92MQ==",
+    "execution_id": "bGluZWFyLWdvbGRlbmNhcHR1cmUtMDAwMQ=="
+  },
+  "metadata_decoded": {
+    "encoding_options": "",
+    "empty_payload": "\u0000",
+    "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+    "encoding": "json/wf_v1",
+    "execution_id": "linear-goldencapture-0001"
+  },
+  "data_b64": "bnVsbA==",
+  "data_utf8": "null",
+  "data_json": null,
+  "empty": true,
+  "context_echo": {
+    "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+    "execution_id": "linear-goldencapture-0001"
+  },
+  "spec_conformance": "OK"
+}

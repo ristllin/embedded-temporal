@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "embedded-temporal-conformance"
+dynamic = ["version"]  # single source: mwf_conformance.__version__
+description = "Conformance kit for the embedded-temporal ESP32 worker: golden vectors (Temporal event histories + Mistral payload envelopes) captured from the real SDKs, the capture tooling, live end-to-end drivers, and wire probes."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Roy Darnell", email = "contact@cumulo-nimbus.ai" },
+]
+keywords = ["temporal", "mistral-workflows", "esp32", "conformance", "golden-vectors"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Testing",
+]
+# The oracle SDKs — the source of truth the C++ tracks are validated against.
+# PINNED to the versions the committed golden vectors were captured with (see
+# requirements.txt); a floating resolve would let a re-capture silently diverge
+# from the committed goldens.
+dependencies = [
+    "mistralai-workflows==3.9.0",   # Mistral Workflows SDK (WorkflowContext / Payload oracle)
+    "temporalio==1.27.2",           # Temporal Python SDK (event-history oracle + dev server)
+]
+
+[project.urls]
+Homepage = "https://github.com/ristllin/embedded-temporal"
+Repository = "https://github.com/ristllin/embedded-temporal.git"
+Issues = "https://github.com/ristllin/embedded-temporal/issues"
+
+# The repo keeps capture/, e2e/, probe/, goldens/ at the conformance root so
+# they stay runnable as plain scripts; package-dir maps them in as
+# mwf_conformance.* subpackages of the distribution.
+[tool.setuptools]
+packages = [
+    "mwf_conformance",
+    "mwf_conformance.capture",
+    "mwf_conformance.e2e",
+    "mwf_conformance.probe",
+    "mwf_conformance.goldens",
+]
+
+[tool.setuptools.package-dir]
+"mwf_conformance" = "mwf_conformance"
+"mwf_conformance.capture" = "capture"
+"mwf_conformance.e2e" = "e2e"
+"mwf_conformance.probe" = "probe"
+"mwf_conformance.goldens" = "goldens"
+
+[tool.setuptools.package-data]
+# Ship the vectors and captured reference responses; e2e run evidence
+# (e2e/evidence/) and the repo-path .sh wrappers stay out of the wheel.
+"mwf_conformance.goldens" = ["README.md", "NOTES.md", "payloads/*.json", "histories/*.json"]
+"mwf_conformance.probe" = ["*.json"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mwf_conformance.__version__" }

@@ -1,0 +1,84 @@
+{
+  "workflow": "mwf_e2e_device",
+  "task_queue": "mwf-esp32-shell",
+  "execute_response": {
+    "workflow_name": "mwf_e2e_device",
+    "workflow_id": null,
+    "deployment_name": null,
+    "execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "parent_execution_id": null,
+    "root_execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "run_id": null,
+    "user_id": null,
+    "status": "RUNNING",
+    "start_time": "2026-07-18T11:24:27.071464Z",
+    "end_time": null,
+    "total_duration_ms": null,
+    "result": null
+  },
+  "final_status": {
+    "workflow_name": "mwf_e2e_device",
+    "workflow_id": "019f74f8-3f28-755f-ae7f-eb511af6e55a",
+    "deployment_name": "mwf-esp32-shell",
+    "execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "parent_execution_id": null,
+    "root_execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "run_id": null,
+    "user_id": "22222222-2222-4222-8222-222222222222",
+    "status": "COMPLETED",
+    "start_time": "2026-07-18T11:24:27.071464Z",
+    "end_time": "2026-07-18T11:24:28.353469Z",
+    "total_duration_ms": 1282,
+    "result": {
+      "context": {
+        "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+        "execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+        "parent_workflow_exec_id": null,
+        "root_workflow_exec_id": null,
+        "execution_token": "4d6a25e0-0000-4000-8000-000000000000",
+        "on_behalf_of": false,
+        "extensions": {}
+      },
+      "payload": {
+        "echo": "nimbus-esp32",
+        "device": "mwf-esp32s3",
+        "build": "d1fc3fb-dirty",
+        "heap_kb": 239
+      },
+      "empty": false
+    }
+  },
+  "runs_listing_status": 200,
+  "runs_listing_entry": {
+    "workflow_name": "mwf_e2e_device",
+    "workflow_id": "019f74f8-3f28-755f-ae7f-eb511af6e55a",
+    "deployment_name": "mwf-esp32-shell",
+    "execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "parent_execution_id": null,
+    "root_execution_id": "d9d423a02a2d5905bf6de668fb9b2976b59f7fd115fc5111b5dea27ac564b246",
+    "run_id": "019f74f8-7259-74f5-ba55-55cd26d8c292",
+    "user_id": "22222222-2222-4222-8222-222222222222",
+    "status": "COMPLETED",
+    "start_time": "2026-07-18T11:24:27.071464Z",
+    "end_time": "2026-07-18T11:24:28.353469Z",
+    "total_duration_ms": 1282
+  },
+  "workflow_definition": {
+    "workflow": {
+      "id": "019f74f8-3f28-755f-ae7f-eb511af6e55a",
+      "name": "mwf_e2e_device",
+      "display_name": "mwf_e2e_device",
+      "type": "code",
+      "description": "",
+      "customer_id": "00000000-0000-4000-8000-000000000000",
+      "workspace_id": "11111111-1111-4111-8111-111111111111",
+      "shared_namespace": null,
+      "available_in_chat_assistant": false,
+      "is_technical": false,
+      "archived": false,
+      "tags": [],
+      "active": true
+    }
+  },
+  "captured_at": "2026-07-18T12:24:29+0100"
+}

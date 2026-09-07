@@ -1,0 +1,29 @@
+// Minimal WorkflowService — only the RPCs a worker needs. We declare our own
+// service (same package/name as Temporal's) instead of compiling the official
+// service.proto, which depends on google/api grpc-gateway annotations we don't
+// need. The gRPC method path is derived from package + service + method, so this
+// is wire-identical to the real WorkflowService for these calls.
+syntax = "proto3";
+
+package temporal.api.workflowservice.v1;
+
+import "temporal/api/workflowservice/v1/request_response.proto";
+
+service WorkflowService {
+  // --- worker task loop ---
+  rpc PollWorkflowTaskQueue(PollWorkflowTaskQueueRequest) returns (PollWorkflowTaskQueueResponse);
+  rpc RespondWorkflowTaskCompleted(RespondWorkflowTaskCompletedRequest) returns (RespondWorkflowTaskCompletedResponse);
+  rpc RespondWorkflowTaskFailed(RespondWorkflowTaskFailedRequest) returns (RespondWorkflowTaskFailedResponse);
+  rpc PollActivityTaskQueue(PollActivityTaskQueueRequest) returns (PollActivityTaskQueueResponse);
+  rpc RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest) returns (RespondActivityTaskCompletedResponse);
+  rpc RespondActivityTaskFailed(RespondActivityTaskFailedRequest) returns (RespondActivityTaskFailedResponse);
+  rpc RecordActivityTaskHeartbeat(RecordActivityTaskHeartbeatRequest) returns (RecordActivityTaskHeartbeatResponse);
+
+  // --- worker deployment versioning (Mistral routes tasks to the current version) ---
+  rpc SetWorkerDeploymentCurrentVersion(SetWorkerDeploymentCurrentVersionRequest) returns (SetWorkerDeploymentCurrentVersionResponse);
+  rpc DescribeWorkerDeployment(DescribeWorkerDeploymentRequest) returns (DescribeWorkerDeploymentResponse);
+
+  // --- handy for connectivity/debug ---
+  rpc DescribeNamespace(DescribeNamespaceRequest) returns (DescribeNamespaceResponse);
+  rpc GetSystemInfo(GetSystemInfoRequest) returns (GetSystemInfoResponse);
+}

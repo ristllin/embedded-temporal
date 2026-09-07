@@ -1,0 +1,105 @@
+// device_activity.proto — the DEVICE (nanopb) trim of the activity-worker wire.
+//
+// A wire-identical mirror of ONLY the messages + fields the ESP32 worker loop
+// touches (core IWorkerProtoAdapter: build poll / parse poll / respond
+// completed / respond failed). Protobuf encoding carries no package or message
+// names — only field numbers and wire types — so these slim mirrors are
+// byte-compatible with temporal.api.* as long as the FIELD NUMBERS below match
+// the vendored originals (third_party/temporal-api). They are asserted
+// cross-lib by test/test_nanopb_device_conformance.cpp (nanopb encode →
+// libprotobuf decode of the REAL temporal messages, and back).
+//
+// Why a mirror instead of generating request_response.proto with nanopb: that
+// file aggregates every WorkflowService RPC (3.5k lines), whose nanopb structs
+// blow past the 64 KB / 16-bit field-offset ceilings and would statically cost
+// hundreds of KB (see ../README.md "Trimming"). This file is the
+// "workflow-task subset" trim: 4 RPC messages + their 8-message closure.
+//
+// Fields deliberately OMITTED from the originals (deployment options, worker
+// version stamps, headers, heartbeat details, timestamps, retry policy, poller
+// scaling…) are simply never sent (requests) or skipped as unknown fields
+// (responses) — proto3 semantics.
+syntax = "proto3";
+
+package mwf.device.v1;
+
+// temporal.api.taskqueue.v1.TaskQueue — name=1, kind=2 (enum on the wire is a
+// varint; 1 = TASK_QUEUE_KIND_NORMAL).
+message TaskQueue {
+  string name = 1;
+  int32 kind = 2;
+}
+
+// temporal.api.common.v1.WorkflowExecution
+message WorkflowExecution {
+  string workflow_id = 1;
+  string run_id = 2;
+}
+
+// temporal.api.common.v1.WorkflowType / ActivityType
+message WorkflowType { string name = 1; }
+message ActivityType { string name = 1; }
+
+// temporal.api.common.v1.Payload — metadata=1 (map<string,bytes>), data=2.
+message Payload {
+  map<string, bytes> metadata = 1;
+  bytes data = 2;
+}
+
+// temporal.api.common.v1.Payloads
+message Payloads {
+  repeated Payload payloads = 1;
+}
+
+// temporal.api.failure.v1.ApplicationFailureInfo — type=1 (rest omitted).
+message ApplicationFailureInfo { string type = 1; }
+
+// temporal.api.failure.v1.Failure — message=1, source=2, stack_trace=3,
+// application_failure_info=5 (member of the failure_info oneof in the
+// original; a oneof member encodes exactly like a plain field).
+message Failure {
+  string message = 1;
+  string source = 2;
+  string stack_trace = 3;
+  ApplicationFailureInfo application_failure_info = 5;
+}
+
+// temporal.api.workflowservice.v1.PollActivityTaskQueueRequest —
+// namespace=1, task_queue=2, identity=3.
+message PollActivityTaskQueueRequest {
+  string namespace_ = 1;  // "namespace" is a C++ keyword; field NAMES are not on the wire
+  TaskQueue task_queue = 2;
+  string identity = 3;
+}
+
+// temporal.api.workflowservice.v1.PollActivityTaskQueueResponse — the fields
+// the worker loop consumes: task_token=1, workflow_type=3,
+// workflow_execution=4, activity_type=5, input=8, attempt=13.
+message PollActivityTaskQueueResponse {
+  bytes task_token = 1;
+  WorkflowType workflow_type = 3;
+  WorkflowExecution workflow_execution = 4;
+  ActivityType activity_type = 5;
+  Payloads input = 8;
+  int32 attempt = 13;
+}
+
+// temporal.api.workflowservice.v1.RespondActivityTaskCompletedRequest —
+// task_token=1, result=2, identity=3, namespace=4.
+message RespondActivityTaskCompletedRequest {
+  bytes task_token = 1;
+  Payloads result = 2;
+  string identity = 3;
+  string namespace_ = 4;  // "namespace" is a C++ keyword; field NAMES are not on the wire
+}
+message RespondActivityTaskCompletedResponse {}
+
+// temporal.api.workflowservice.v1.RespondActivityTaskFailedRequest —
+// task_token=1, failure=2, identity=3, namespace=4.
+message RespondActivityTaskFailedRequest {
+  bytes task_token = 1;
+  Failure failure = 2;
+  string identity = 3;
+  string namespace_ = 4;  // "namespace" is a C++ keyword; field NAMES are not on the wire
+}
+message RespondActivityTaskFailedResponse {}

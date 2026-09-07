@@ -1,0 +1,31 @@
+{
+  "name": "cookbook-02-ai-workflow",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "text": { "type": "string", "title": "Text to classify" }
+    },
+    "required": ["text"],
+    "title": "ai_Input"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "ai_Output"
+  },
+  "steps": [
+    { "type": "activity", "name": "ai.classify", "id": "classify", "args_from": "/input/classify" },
+    {
+      "type": "conditional",
+      "predicate": { "path": "/results/classify/label", "op": "eq", "value": "positive" },
+      "true_steps": [
+        { "type": "activity", "name": "ai.chat", "id": "reply", "args_from": "/input/positive" }
+      ],
+      "false_steps": [
+        { "type": "activity", "name": "ai.chat", "id": "reply", "args_from": "/input/negative" }
+      ]
+    },
+    { "type": "complete", "result_from": "/results" }
+  ]
+}

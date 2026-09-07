@@ -1,0 +1,30 @@
+embedded-temporal
+Copyright (c) 2026 Roy Darnell
+
+This product includes third-party software under the following licenses.
+Each dependency's full license text is retained alongside its source.
+
+- nanopb — zlib License
+  proto/third_party/nanopb/  (LICENSE.txt)
+  https://github.com/nanopb/nanopb
+
+- Temporal API protobuf definitions — MIT License
+  Copyright (c) Temporal Technologies, Inc.
+  proto/third_party/temporal-api/  (LICENSE)
+  https://github.com/temporalio/api
+
+- nghttp2 — MIT License
+  Copyright (c) Tatsuhiro Tsujikawa
+  transport/esp/third_party/nghttp2/  (COPYING)
+  https://github.com/nghttp2/nghttp2
+
+- nlohmann/json — MIT License
+  Copyright (c) 2013-2022 Niels Lohmann
+  firmware/vendor/nlohmann/  (LICENSE.MIT)
+  https://github.com/nlohmann/json
+
+This project is an independent, clean-room implementation of a Temporal
+worker/client protocol subset. It is not affiliated with, endorsed by, or
+sponsored by Temporal Technologies, Inc. or Mistral AI. "Temporal" and
+"Mistral" are trademarks of their respective owners and are used here only to
+describe interoperability.

@@ -1,0 +1,19 @@
+{
+  "name": "cookbook-04-human-in-the-loop",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "hitl_Input"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "hitl_Output"
+  },
+  "steps": [
+    { "type": "activity", "name": "echo", "id": "request", "args_from": "/input" },
+    { "type": "wait_signal", "signal": "approve", "id": "gate" },
+    { "type": "activity", "name": "echo", "id": "after", "args_from": "/results/gate" },
+    { "type": "complete", "result_from": "/results/after" }
+  ]
+}

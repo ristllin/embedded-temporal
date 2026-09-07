@@ -1,0 +1,25 @@
+{
+  "name": "embedded-temporal",
+  "version": "0.1.1",
+  "description": "Run a Mistral Workflows / Temporal activity worker on an ESP32: register, long-poll for activity tasks over gRPC/TLS, run your handler, report the result. No cloud SDK, no host in the loop. Requires arduino-esp32 core 3.x (see README).",
+  "keywords": "temporal, mistral-workflows, grpc, esp32, iot, worker, nanopb, http2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ristllin/embedded-temporal.git"
+  },
+  "homepage": "https://github.com/ristllin/embedded-temporal",
+  "authors": [
+    {
+      "name": "Roy Darnell",
+      "email": "contact@cumulo-nimbus.ai",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "headers": "EmbeddedTemporal.h",
+  "export": {
+    "exclude": [".pio", ".vscode", "*.tar.gz"]
+  }
+}

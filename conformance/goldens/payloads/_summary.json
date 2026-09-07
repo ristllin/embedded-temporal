@@ -1,0 +1,46 @@
+{
+  "payloads": [
+    {
+      "file": "greet-in.json",
+      "findings": [],
+      "metadata_keys": [
+        "encoding",
+        "encoding_options",
+        "execution_id",
+        "namespace"
+      ]
+    },
+    {
+      "file": "greet-out.json",
+      "findings": [],
+      "metadata_keys": [
+        "encoding",
+        "encoding_options",
+        "execution_id",
+        "namespace"
+      ]
+    },
+    {
+      "file": "struct-out.json",
+      "findings": [],
+      "metadata_keys": [
+        "encoding",
+        "encoding_options",
+        "execution_id",
+        "namespace"
+      ]
+    },
+    {
+      "file": "empty-out.json",
+      "findings": [],
+      "metadata_keys": [
+        "empty_payload",
+        "encoding",
+        "encoding_options",
+        "execution_id",
+        "namespace"
+      ]
+    }
+  ],
+  "namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111"
+}

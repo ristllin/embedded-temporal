@@ -1,0 +1,38 @@
+{
+  "task_token": "CiRhZWJmYzZlYi05ZjIyLTQyNTYtYWJmNS05ZDIxYmYwYmIzODcSQDQ0NTgyZGVjMjFkZjU0ZjliYzNkOWZiNjc2Yjc2MDljNzczNmQ1NzdiMWVkNTNlOWI4NTEyOTBhMjJiZmRkMWUaJDAxOWY3NTBjLTUyMTctNzhlMC05NjAxLTE2MGIwMWM3NmZmNSAFKAEyATFCC2RldmljZS5lY2hvSgoIkgIQydrRNhgB",
+  "workflow_namespace": "00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111",
+  "workflow_type": {
+    "name": "mwf_sole_probe_act"
+  },
+  "workflow_execution": {
+    "workflow_id": "44582dec21df54f9bc3d9fb676b7609c7736d577b1ed53e9b851290a22bfdd1e",
+    "run_id": "019f750c-5217-78e0-9601-160b01c76ff5"
+  },
+  "activity_type": {
+    "name": "device.echo"
+  },
+  "activity_id": "1",
+  "input": {
+    "payloads": [
+      {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg=="
+        },
+        "data": "Im5pbWJ1cyI="
+      }
+    ]
+  },
+  "scheduled_time": "2026-07-18T11:46:09.783513785Z",
+  "current_attempt_scheduled_time": "2026-07-18T11:46:09.783513785Z",
+  "started_time": "2026-07-18T11:46:09.875424320Z",
+  "attempt": 1,
+  "schedule_to_close_timeout": "120s",
+  "start_to_close_timeout": "60s",
+  "heartbeat_timeout": "0s",
+  "retry_policy": {
+    "initial_interval": "1s",
+    "backoff_coefficient": 2.0,
+    "maximum_interval": "100s"
+  },
+  "priority": {}
+}

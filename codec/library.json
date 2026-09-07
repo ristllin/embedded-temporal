@@ -1,0 +1,23 @@
+{
+  "name": "codec",
+  "version": "0.1.0",
+  "description": "mwf payload codec: Mistral WorkflowContext envelope codec. Portable C++17. NOTE: the .cpp are host-built (nlohmann/json) + host-tested in this repo; on device the JSON-lib-free portable TUs (payload_codec.cpp) compile too; the rest stays host-only.",
+  "keywords": "mwf, temporal, mistral-workflows, codec, esp32",
+  "authors": [
+    {
+      "name": "Roy Darnell"
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "contracts": "symlink://../contracts"
+  },
+  "build": {
+    "srcFilter": [
+      "-<*>",
+      "+<payload_codec.cpp>"
+    ]
+  }
+}

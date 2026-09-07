@@ -1,0 +1,5 @@
+[worker] whoami: scheduler=wf-scheduler.mistral.ai:443 namespace=00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111 tls=1
+[worker] polling target=wf-scheduler.mistral.ai:443 ns=00000000-0000-4000-8000-000000000000:11111111-1111-4111-8111-111111111111 task_queue=mwf-cpp-live identity=mwf-cpp-live@desktop poll_ms=30000
+[worker] tick#1 completed activity=greet (wire=json/wf_v1 token_bytes=168 result_bytes=23) elapsed_ms=3946
+[worker] tick#2 idle (taskless poll response) elapsed_ms=29177
+[worker] stopping (ticks=2)

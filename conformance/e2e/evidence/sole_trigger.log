@@ -1,0 +1,8 @@
+[sole] waiting for workflow 'mwf_sole_desktop_1788725060' active ...
+[sole] workflow active; triggering
+[sole] execution_id=662803bcb20957d9885c55c758c68c9d51829e576c035f088d0d19f17fa23411
+[sole] status=COMPLETED
+[sole] ===== TRIGGER VERDICT =====
+[sole] execution_id=662803bcb20957d9885c55c758c68c9d51829e576c035f088d0d19f17fa23411 status=COMPLETED expect("desktop-sole")=1
+[sole] final={"workflow_name":"mwf_sole_desktop_1788725060","workflow_id":"01a07852-676d-747c-a8fe-2142a4a45f74","deployment_name":"mwf-sole-desktop-1788725060","execution_id":"662803bcb20957d9885c55c758c68c9d51829e576c035f088d0d19f17fa23411","parent_execution_id":null,"root_execution_id":"662803bcb20957d9885c55c758c68c9d51829e576c035f088d0d19f17fa23411","run_id":null,"user_id":"22222222-2222-4222-8222-222222222222","status":"COMPLETED","start_time":"2026-09-06T20:04:22.573792Z","end_time":"2026-09-06T20:04:23.271635Z","total_duration_ms":697,"result":{"echo":"nimbus","engine":"mwf-cpp","host":"desktop-sole","worker":"mwf-sole@desktop"},"search_keys":null}
+[sole] evidence -> <repo>/conformance/e2e/evidence/sole_trigger.json

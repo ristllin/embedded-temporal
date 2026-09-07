@@ -1,0 +1,34 @@
+{
+  "name": "cookbook-03-reproducibility",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "n": { "type": "integer", "title": "A number that selects the branch" },
+      "note": { "type": "string", "title": "Free-text carried through" }
+    },
+    "required": ["n"],
+    "title": "repro_Input"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "repro_Output"
+  },
+  "steps": [
+    { "type": "activity", "name": "echo", "id": "capture", "args_from": "/input" },
+    {
+      "type": "conditional",
+      "predicate": { "path": "/input/n", "op": "ge", "value": 3 },
+      "true_steps": [
+        { "type": "activity", "name": "echo", "id": "branch",
+          "args": { "branch": "big", "reason": "n >= 3" } }
+      ],
+      "false_steps": [
+        { "type": "activity", "name": "echo", "id": "branch",
+          "args": { "branch": "small", "reason": "n < 3" } }
+      ]
+    },
+    { "type": "complete", "result_from": "/results" }
+  ]
+}

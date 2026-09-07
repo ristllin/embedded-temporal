@@ -1,0 +1,17 @@
+{
+  "name": "cookbook-01-hello-world",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "hello_Input"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "title": "hello_Output"
+  },
+  "steps": [
+    { "type": "activity", "name": "echo", "id": "greeting", "args_from": "/input" },
+    { "type": "complete", "result_from": "/results/greeting" }
+  ]
+}

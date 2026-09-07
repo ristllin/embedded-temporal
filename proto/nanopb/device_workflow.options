@@ -1,0 +1,94 @@
+# device_workflow.options — nanopb caps for the DEVICE workflow-task subset
+# (proto/mwf/device_workflow.proto). Precedence: LAST matching line wins, so the
+# wildcard defaults go first and specifics below.
+#
+# NOTE ON SHARED TYPES: device_workflow.proto IMPORTS device_activity.proto for
+# Payload/Payloads/WorkflowExecution/Workflow-/ActivityType/TaskQueue/Failure.
+# Those structs are generated (and CAPPED) by device_activity.options during the
+# device_activity generation pass — nanopb only references them here, it does not
+# regenerate them, so their caps live in device_activity.options, NOT this file.
+# This file caps ONLY device_workflow.proto's OWN string/bytes/repeated fields.
+#
+# ── Static-footprint accounting (why the caps are what they are) ──────────────
+# A HistoryEvent's oneof is a C union sized to its largest arm. The Payloads-
+# carrying arms dominate: Payloads = 4 × Payload, each Payload = metadata[8]
+# (~1.6 KB) + data[8192] (device_activity caps) ≈ 9.8 KB, so Payloads ≈ 39 KB and
+# a HistoryEvent ≈ 39 KB. History.events[64] ⇒ History ≈ 2.5 MB, and
+# PollWorkflowTaskQueueResponse ≈ 2.5 MB. That is HEAP-allocated per poll — on
+# the device that heap is PSRAM (8 MB, heap_caps_malloc_extmem_enable), NEVER the
+# stack/statics (same rule as the activity subset). To shrink for tighter RAM,
+# lower History.events max_count or device_activity's Payload.data cap.
+
+# ── Global defaults (matched first, overridden below) ─────────────────────────
+# ⚠ 256 B (was 64) — HARDWARE-CAUGHT (ESP32-S3): a REAL Mistral history carries a
+# 64-hex-char EXECUTION id as workflow_id (measured 64 chars in
+# probe/workflow_task_1.json), and nanopb reserves 1 B for the
+# NUL, so max_size:64 held only 63 chars → PollWorkflowTaskQueueResponse aborted
+# the whole poll with "string overflow". The golden histories use SHORT synthetic
+# ids ("linear-goldencapture-0001") so the golden-only conformance test never hit
+# it. This default now covers device_workflow's OWN string fields — most notably
+# WorkflowExecutionStartedEventAttributes.workflow_id (field 28) — plus run/request
+# ids (UUID 36 B) and server identity strings ("1@api-workflows-…", 32 B): real max
+# 64 → 256 = 4× headroom. These structs are PSRAM-heap-allocated per poll (see the
+# footnote), so the extra bytes are cheap; correctness wins.
+* max_size:256
+* max_count:4
+
+# ── ⚠ SHARED-TYPE caps MUST MIRROR device_activity.options ────────────────────
+# device_workflow imports Payload/Payloads/Failure from device_activity. nanopb
+# computes each static-submessage field's WIDTH (PB_BIND width, data_size bits)
+# at GENERATION time from the caps IT sees in THIS pass — but the field's REAL
+# struct is the one compiled from device_activity.pb.h. If the two disagree,
+# nanopb hardcodes too-narrow a width (e.g. width-2 data_size=12bit=4 KB) and the
+# generated device_workflow.pb.c fails to compile against the real 8 KB Payload
+# (FIELDINFO_DOES_NOT_FIT). So these lines are copied verbatim from
+# device_activity.options and MUST stay in sync with it.
+mwf.device.v1.Payload.data                     max_size:8192
+mwf.device.v1.Payload.metadata                 max_count:8
+mwf.device.v1.Payload.MetadataEntry.key        max_size:64
+mwf.device.v1.Payload.MetadataEntry.value      max_size:128
+mwf.device.v1.Payloads.payloads                max_count:4
+mwf.device.v1.Failure.message                  max_size:512
+mwf.device.v1.Failure.stack_trace              max_size:256
+mwf.device.v1.Failure.source                   max_size:64
+# Shared IDENTITY types embedded in device_workflow messages (WorkflowExecution
+# in PollWFTQResponse.field2; WorkflowType/ActivityType/TaskQueue in event arms).
+# nanopb sizes each embedded submessage field from the caps IT sees in THIS pass,
+# so these MUST match what device_activity.options compiled the real struct to, or
+# the widths disagree (FIELDINFO_DOES_NOT_FIT). WorkflowExecution.workflow_id is the
+# 64-hex Mistral execution id (measured 64 B) → 256; the rest are UUIDs/short names.
+mwf.device.v1.WorkflowExecution.workflow_id    max_size:256
+mwf.device.v1.WorkflowExecution.run_id         max_size:128
+mwf.device.v1.WorkflowType.name                max_size:128
+mwf.device.v1.ActivityType.name                max_size:128
+mwf.device.v1.TaskQueue.name                   max_size:128
+
+# ── History: a v1 workflow history is small; 64 events covers the goldens with
+#    headroom (linear = 17 events). This is the multiplicative knob — see above. ─
+mwf.device.v1.History.events                                          max_count:64
+
+# ── Task tokens / page tokens are opaque server bytes; give them room. ─────────
+# next_page_token stays capped despite the single-page v1 assumption: a non-empty
+# value must be DECODABLE so the worker can detect+refuse a paged task, not
+# silently truncate the history.
+mwf.device.v1.PollWorkflowTaskQueueResponse.task_token               max_size:256
+mwf.device.v1.PollWorkflowTaskQueueResponse.next_page_token          max_size:256
+mwf.device.v1.RespondWorkflowTaskCompletedRequest.task_token         max_size:256
+
+# ── namespace is "<uuid>:<uuid>" = 73 chars on the Mistral frontend → 128. ─────
+mwf.device.v1.PollWorkflowTaskQueueRequest.namespace_                max_size:128
+mwf.device.v1.PollWorkflowTaskQueueRequest.identity                  max_size:128
+mwf.device.v1.RespondWorkflowTaskCompletedRequest.namespace_         max_size:128
+mwf.device.v1.RespondWorkflowTaskCompletedRequest.identity           max_size:128
+
+# ── Commands a single workflow task emits: a handful (schedule N activities,
+#    start timers, then complete/fail). 16 covers fan-out with headroom. ────────
+mwf.device.v1.RespondWorkflowTaskCompletedRequest.commands           max_count:16
+
+# ── SignalWorkflowExecutionRequest (ClientOps::signalWorkflow). Its OWN strings;
+# workflow_execution.workflow_id (the 64-hex Mistral execution id) + input Payloads
+# are shared types capped above. namespace "<uuid>:<uuid>"=73 → 128; signal_name is
+# author-defined (short) but 128 gives ample headroom; identity like the poll req. ─
+mwf.device.v1.SignalWorkflowExecutionRequest.namespace_              max_size:128
+mwf.device.v1.SignalWorkflowExecutionRequest.signal_name             max_size:128
+mwf.device.v1.SignalWorkflowExecutionRequest.identity                max_size:128
